@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand-50: #eef6ff;
+  --color-brand-100: #d9ebff;
+  --color-brand-500: #2f7de1;
+  --color-brand-600: #1f63bd;
+  --color-brand-700: #1a4f97;
+
+  --color-level-beginner: #1f9d55;
+  --color-level-intermediate: #d97706;
+  --color-level-advanced: #b91c1c;
+
+  --font-sans: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', system-ui, sans-serif;
+}
+
+html {
+  color-scheme: light dark;
+  background: #f7f8fa;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    background: #0e1116;
+  }
+}

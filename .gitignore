@@ -1,0 +1,23 @@
+# build output
+dist/
+.output/
+.vercel/
+
+# deps
+node_modules/
+
+# go
+/tmp/
+*.exe
+*.test
+
+# env
+.env
+.env.*
+!.env.example
+
+# editor / os
+.DS_Store
+.idea/
+.vscode/
+*.log

@@ -1,0 +1,19 @@
+{
+  "name": "studytune",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "プログラミング学習リソースをレベル別に調律するナビゲーションサイト",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/vercel": "^11.0.8",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.2.9",
+    "tailwindcss": "^4.3.3"
+  }
+}
