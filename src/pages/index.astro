@@ -1,0 +1,131 @@
+---
+import Base from '../layouts/Base.astro';
+import ResourceCard from '../components/ResourceCard.astro';
+import { fetchResources } from '../lib/api';
+import { LEVELS, type Level } from '../lib/types';
+
+const url = Astro.url;
+const levelParam = (url.searchParams.get('level') ?? '') as Level | '';
+const topicParam = url.searchParams.get('topic') ?? '';
+const validLevel = LEVELS.some((l) => l.key === levelParam) ? levelParam : '';
+
+const data = await fetchResources(url.origin, { level: validLevel, topic: topicParam, per: 30 });
+
+// トピック候補は取得結果から集める（絞り込み中でも全体を出したいので topic なしで問い合わせ直す）
+const full = topicParam
+  ? await fetchResources(url.origin, { level: validLevel, per: 30 })
+  : data;
+const topics = [...new Set(full.resources.flatMap((r) => Object.keys(r.topics)))].sort();
+
+// レベル別カウント（バッジ表示用）
+const countByLevel = (lvl: Level) => full.resources.filter((r) => r.level === lvl).length;
+
+function withParam(key: string, value: string) {
+  const p = new URLSearchParams(url.search);
+  if (value) p.set(key, value);
+  else p.delete(key);
+  const qs = p.toString();
+  return qs ? `/?${qs}` : '/';
+}
+---
+
+<Base>
+  <section>
+    <h1 class="text-2xl font-bold tracking-tight">学習リソースをレベル別に調律する</h1>
+    <p class="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
+      記事の難易度を複数シグナル（タグ / 前提知識の明示 / 専門用語密度 / 説明の丁寧さ /
+      一次資料リンク / コード比率 / 記事長）の加重和で自動推定し、初級・中級・上級に整理します。
+      いいね数は<strong>品質</strong>の指標であり、難易度とは別軸で扱います。
+    </p>
+  </section>
+
+  {
+    data.source === 'sample' && (
+      <p class="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+        {'degraded' in data && data.degraded
+          ? 'Go API に接続できないため、埋め込みサンプルを表示しています（ローカル実行時など）。'
+          : 'Qiita API が制限中のため、埋め込みサンプルにフォールバックしています。'}
+      </p>
+    )
+  }
+
+  <div class="mt-6 space-y-3">
+    <div class="flex flex-wrap items-center gap-2 text-sm">
+      <span class="text-slate-400">レベル:</span>
+      <a
+        href={withParam('level', '')}
+        class:list={[
+          'rounded-full border px-3 py-1',
+          !validLevel
+            ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-100'
+            : 'border-slate-200 dark:border-slate-700',
+        ]}
+      >
+        すべて
+      </a>
+      {
+        LEVELS.map((l) => (
+          <a
+            href={withParam('level', l.key)}
+            class:list={[
+              'rounded-full border px-3 py-1',
+              validLevel === l.key
+                ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-100'
+                : 'border-slate-200 dark:border-slate-700',
+            ]}
+          >
+            {l.label}
+            <span class="ml-1 text-xs text-slate-400">{countByLevel(l.key)}</span>
+          </a>
+        ))
+      }
+    </div>
+
+    {
+      topics.length > 0 && (
+        <div class="flex flex-wrap items-center gap-2 text-sm">
+          <span class="text-slate-400">トピック:</span>
+          <a
+            href={withParam('topic', '')}
+            class:list={[
+              'rounded-full border px-3 py-1',
+              !topicParam
+                ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-100'
+                : 'border-slate-200 dark:border-slate-700',
+            ]}
+          >
+            すべて
+          </a>
+          {topics.map((t) => (
+            <a
+              href={withParam('topic', t)}
+              class:list={[
+                'rounded-full border px-3 py-1',
+                topicParam === t
+                  ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-100'
+                  : 'border-slate-200 dark:border-slate-700',
+              ]}
+            >
+              {t}
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+
+  <p class="mt-6 text-xs text-slate-400">
+    {data.resources.length} 件 / クエリ: <code>{data.query}</code> / データ源: {data.source}
+  </p>
+
+  <div class="mt-3 space-y-3">
+    {data.resources.map((r) => <ResourceCard resource={r} />)}
+    {
+      data.resources.length === 0 && (
+        <p class="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-sm text-slate-400 dark:border-slate-700">
+          条件に合うリソースがありません。
+        </p>
+      )
+    }
+  </div>
+</Base>
