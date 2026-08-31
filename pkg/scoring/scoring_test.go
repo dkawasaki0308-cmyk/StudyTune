@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"studytune/internal/qiita"
+	"studytune/pkg/qiita"
 )
 
 func tag(names ...string) []qiita.Tag {

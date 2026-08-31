@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"time"
 
-	"studytune/internal/catalog"
-	"studytune/internal/httpx"
-	"studytune/internal/qiita"
-	"studytune/internal/sample"
-	"studytune/internal/scoring"
+	"studytune/pkg/catalog"
+	"studytune/pkg/httpx"
+	"studytune/pkg/qiita"
+	"studytune/pkg/sample"
+	"studytune/pkg/scoring"
 )
 
 // Resources は GET /api/resources を処理する。

@@ -9,7 +9,7 @@ Astro フロント（SSR）と Go の API を疎結合にし、両方を Vercel 
 - Go 関数は Vercel の制約（`/api` 直下の各ファイルが個別ビルド）に合わせ、
   `api/index.go` 1 本に集約し、`r.URL.Path` で内部ディスパッチする。
   `vercel.json` で `/api/(.*)` → `/api/index` を rewrite。
-- 実処理は `internal/api/{resources,feedback}.go` に分離。これでローカルの
+- 実処理は `pkg/api/{resources,feedback}.go` に分離。これでローカルの
   `go build ./...` も素直に通り、テストも書ける。
 
 ### なぜこの技術構成か
@@ -32,7 +32,7 @@ Astro フロント（SSR）と Go の API を疎結合にし、両方を Vercel 
 - **各シグナルを 0..1 に正規化 → 加重和 → 0..5 にマップ。**
   重みは設定値（`scoring.DefaultWeights`）として外出しし、チューニング可能にする。
 
-### シグナル（`internal/scoring/`）
+### シグナル（`pkg/scoring/`）
 
 | シグナル | 取得方法 | 方向 | 既定重み |
 |---|---|---|---|

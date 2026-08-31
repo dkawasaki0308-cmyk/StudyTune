@@ -31,7 +31,7 @@
 | フロント | Astro 7 + TypeScript + Tailwind CSS v4 | SSR（`@astrojs/vercel`）。絞り込みはクエリパラメータ駆動で JS 最小 |
 | API | Go（標準 `net/http`） | Vercel の Go サーバーレス関数。`api/index.go` 1 本に集約しパスで内部ディスパッチ |
 | データ源 | Qiita API v2 | 保存するのはメタデータ + 自作要約のみ。本文の転載はしない |
-| 難易度推定 | 複数シグナルの加重和 | `internal/scoring/`。重み・境界は設定値で外出し |
+| 難易度推定 | 複数シグナルの加重和 | `pkg/scoring/`。重み・境界は設定値で外出し |
 
 技術選定の理由は [`docs/architecture.md`](docs/architecture.md)、選考で説明する技術判断は
 [`docs/es-notes.md`](docs/es-notes.md) に整理。
@@ -40,7 +40,7 @@
 
 ```
 api/index.go              Vercel の Go 関数エントリ（/api/* を内部ディスパッチ）
-internal/
+pkg/
   api/                    エンドポイント本体（resources / feedback）
   qiita/                  Qiita API v2 クライアント
   scoring/                難易度スコアラー（7 シグナルの加重和）＋テスト
