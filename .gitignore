@@ -2,6 +2,7 @@
 dist/
 .output/
 .vercel/
+.astro/
 
 # deps
 node_modules/

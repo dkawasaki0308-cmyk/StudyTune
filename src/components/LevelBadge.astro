@@ -1,0 +1,22 @@
+---
+import type { Level } from '../lib/types';
+
+interface Props {
+  level: Level;
+  label: string;
+  difficulty?: number;
+}
+
+const { level, label, difficulty } = Astro.props;
+
+const styles: Record<Level, string> = {
+  beginner: 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300',
+  intermediate: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+  advanced: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300',
+};
+---
+
+<span class={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${styles[level]}`}>
+  {label}
+  {difficulty !== undefined && <span class="font-mono font-normal opacity-70">{difficulty.toFixed(1)}</span>}
+</span>

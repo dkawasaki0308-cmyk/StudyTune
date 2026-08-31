@@ -1,0 +1,69 @@
+---
+import type { Level } from '../lib/types';
+
+interface Props {
+  url: string;
+  level: Level;
+  difficulty: number;
+}
+
+const { url, level, difficulty } = Astro.props;
+---
+
+<div
+  class="feedback flex items-center gap-2 text-xs"
+  data-url={url}
+  data-level={level}
+  data-difficulty={difficulty}
+>
+  <span class="text-slate-400">この記事は自分にとって:</span>
+  <button data-kind="too-easy" class="fb-btn">簡単すぎた</button>
+  <button data-kind="just-right" class="fb-btn">ちょうど良い</button>
+  <button data-kind="too-hard" class="fb-btn">難しすぎた</button>
+  <span class="fb-msg text-slate-400"></span>
+</div>
+
+<style>
+  .fb-btn {
+    border: 1px solid rgb(203 213 225 / 0.7);
+    border-radius: 9999px;
+    padding: 0.125rem 0.625rem;
+    transition: background-color 0.12s;
+  }
+  .fb-btn:hover {
+    background-color: rgb(148 163 184 / 0.15);
+  }
+  .fb-btn[disabled] {
+    opacity: 0.4;
+    cursor: default;
+  }
+</style>
+
+<script>
+  // フィードバックは唯一の教師信号。POST /api/feedback に送る。
+  // ローカル (Go 関数なし) では 404 になるが、UI 上は送信済み表示にする。
+  document.querySelectorAll<HTMLElement>('.feedback').forEach((root) => {
+    const msg = root.querySelector<HTMLElement>('.fb-msg')!;
+    root.querySelectorAll<HTMLButtonElement>('.fb-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const payload = {
+          url: root.dataset.url,
+          kind: btn.dataset.kind,
+          articleLevel: root.dataset.level,
+          difficulty: Number(root.dataset.difficulty),
+        };
+        root.querySelectorAll<HTMLButtonElement>('.fb-btn').forEach((b) => (b.disabled = true));
+        try {
+          const res = await fetch('/api/feedback', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          msg.textContent = res.ok ? 'ありがとうございます（記録しました）' : `送信エラー (${res.status})`;
+        } catch {
+          msg.textContent = 'オフライン: ローカルでは記録されません';
+        }
+      });
+    });
+  });
+</script>
