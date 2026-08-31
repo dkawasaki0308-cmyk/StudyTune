@@ -1,0 +1,52 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'StudyTune — 学習リソースをレベル別に調律する',
+  description = 'プログラミング学習リソースを言語・技術ごとにレベル別（初級・中級・上級）で整理するナビゲーションサイト。',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-dvh bg-[#f7f8fa] text-slate-800 dark:bg-[#0e1116] dark:text-slate-200">
+    <header class="border-b border-slate-200/70 dark:border-slate-800">
+      <div class="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
+        <a href="/" class="flex items-baseline gap-2">
+          <span class="text-lg font-bold tracking-tight text-brand-600 dark:text-brand-100">StudyTune</span>
+          <span class="text-xs text-slate-500">学習リソースを“調律”する</span>
+        </a>
+        <a
+          href="https://github.com/dkawasaki0308-cmyk/StudyTune"
+          class="text-xs text-slate-500 underline-offset-2 hover:underline"
+          rel="noopener"
+        >
+          GitHub
+        </a>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-4xl px-4 py-8">
+      <slot />
+    </main>
+
+    <footer class="mx-auto max-w-4xl px-4 py-10 text-xs text-slate-400">
+      <p>
+        表示はメタデータ + 自作要約 + 出典明記 + 元記事リンクのみ。本文の転載は行いません。
+        クリックで元サイトへ遷移します。
+      </p>
+      <p class="mt-1">個人開発ポートフォリオ / MVP。難易度スコアは実験的な自動推定です。</p>
+    </footer>
+  </body>
+</html>
