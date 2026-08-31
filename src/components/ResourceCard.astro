@@ -1,0 +1,107 @@
+---
+import type { Resource } from '../lib/types';
+import LevelBadge from './LevelBadge.astro';
+import FeedbackButtons from './FeedbackButtons.astro';
+
+interface Props {
+  resource: Resource;
+}
+
+const { resource: r } = Astro.props;
+
+const published = new Date(r.publishedAt).toLocaleDateString('ja-JP', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+
+// シグナル名 → 日本語ラベル
+const SIGNAL_LABELS: Record<string, string> = {
+  tag: 'タグ',
+  prerequisite: '前提知識の明示',
+  jargon: '専門用語密度',
+  explanatoriness: '説明の丁寧さ（易しさ方向）',
+  externalRefs: '一次資料リンク',
+  codeRatio: 'コード比率',
+  length: '記事長',
+};
+
+// 寄与の大きい順（絶対値）に並べる
+const signals = [...r.signals].sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution));
+const maxAbs = Math.max(...signals.map((s) => Math.abs(s.contribution)), 0.01);
+---
+
+<article class="rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+  <div class="flex items-start justify-between gap-3">
+    <h2 class="text-base font-semibold leading-snug">
+      <a
+        href={r.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-brand-600 hover:underline dark:text-brand-100"
+      >
+        {r.title}
+      </a>
+    </h2>
+    <LevelBadge level={r.level} label={r.levelLabel} difficulty={r.difficulty} />
+  </div>
+
+  {r.summary && <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">{r.summary}</p>}
+
+  <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+    <span class="font-medium text-slate-600 dark:text-slate-400">出典: {r.source}</span>
+    <span>@{r.author}</span>
+    <span>♥ {r.likes}（品質シグナル）</span>
+    <span>{published}</span>
+  </div>
+
+  {
+    r.tags.length > 0 && (
+      <div class="mt-2 flex flex-wrap gap-1">
+        {r.tags.map((t) => (
+          <span class="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+            {t}
+          </span>
+        ))}
+      </div>
+    )
+  }
+
+  <details class="group mt-3 text-xs">
+    <summary class="cursor-pointer select-none text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+      なぜこの難易度か（シグナル内訳）
+    </summary>
+    <ul class="mt-2 space-y-1.5">
+      {
+        signals.map((s) => (
+          <li class="grid grid-cols-[10rem_1fr_auto] items-center gap-2">
+            <span class="truncate text-slate-600 dark:text-slate-400">
+              {SIGNAL_LABELS[s.name] ?? s.name}
+            </span>
+            <span class="relative h-2 rounded bg-slate-100 dark:bg-slate-800">
+              <span
+                class:list={[
+                  'absolute inset-y-0 rounded',
+                  s.contribution >= 0 ? 'left-1/2 bg-brand-500' : 'right-1/2 bg-slate-400',
+                ]}
+                style={`width: ${(Math.abs(s.contribution) / maxAbs) * 50}%`}
+              />
+              <span class="absolute inset-y-0 left-1/2 w-px bg-slate-300 dark:bg-slate-600" />
+            </span>
+            <span class="whitespace-nowrap font-mono text-slate-500" title={s.raw}>
+              {s.contribution >= 0 ? '+' : ''}
+              {s.contribution.toFixed(2)}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="mt-2 text-slate-400">
+      数値は 0〜5 スケールでの寄与ポイント。正=難しくする方向 / 負=易しくする方向。
+    </p>
+  </details>
+
+  <div class="mt-3 border-t border-slate-100 pt-3 dark:border-slate-800">
+    <FeedbackButtons url={r.url} level={r.level} difficulty={r.difficulty} />
+  </div>
+</article>
