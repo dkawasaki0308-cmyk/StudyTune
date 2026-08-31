@@ -10,7 +10,9 @@
 
 ## デモ
 
-- サイト: （デプロイ後に記載）
+- サイト: <https://study-tune.vercel.app>
+- API: `GET /api/resources?level=beginner&topic=go` — Qiita API v2 をライブ取得し、
+  難易度スコアと `signals`（判定根拠）付きで返す
 - Qiita API が制限中／ローカル実行時は、埋め込みサンプル記事へ自動フォールバックして
   同じスコアリングパイプラインを通す（`source: "sample"` をバナー表示）
 
