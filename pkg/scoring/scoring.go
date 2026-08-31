@@ -13,7 +13,7 @@ import (
 	"regexp"
 	"strings"
 
-	"studytune/internal/qiita"
+	"studytune/pkg/qiita"
 )
 
 // Weights は各シグナルの寄与度。合計が 1 になる必要はない (内部で正規化する)。

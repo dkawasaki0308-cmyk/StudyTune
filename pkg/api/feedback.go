@@ -17,7 +17,7 @@ import (
 	"net/http"
 	"strings"
 
-	"studytune/internal/httpx"
+	"studytune/pkg/httpx"
 )
 
 type feedbackRequest struct {

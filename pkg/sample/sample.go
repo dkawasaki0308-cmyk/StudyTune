@@ -9,7 +9,7 @@ import (
 	_ "embed"
 	"encoding/json"
 
-	"studytune/internal/qiita"
+	"studytune/pkg/qiita"
 )
 
 //go:embed items.json

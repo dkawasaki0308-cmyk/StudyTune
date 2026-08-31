@@ -14,8 +14,8 @@ import (
 	"net/http"
 	"strings"
 
-	"studytune/internal/api"
-	"studytune/internal/httpx"
+	"studytune/pkg/api"
+	"studytune/pkg/httpx"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {

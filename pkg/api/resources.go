@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"time"
 
-	"studytune/internal/catalog"
-	"studytune/internal/httpx"
-	"studytune/internal/qiita"
-	"studytune/internal/sample"
-	"studytune/internal/scoring"
+	"studytune/pkg/catalog"
+	"studytune/pkg/httpx"
+	"studytune/pkg/qiita"
+	"studytune/pkg/sample"
+	"studytune/pkg/scoring"
 )
 
 // Resources は GET /api/resources を処理する。
@@ -49,7 +49,8 @@ func Resources(w http.ResponseWriter, r *http.Request) {
 	level := q.Get("level")
 	topic := q.Get("topic")
 
-	ctx, cancel := context.WithTimeout(r.Context(), 12*time.Second)
+	// Vercel Hobby の関数上限 10s に収める。
+	ctx, cancel := context.WithTimeout(r.Context(), 8*time.Second)
 	defer cancel()
 
 	scorer := scoring.NewScorer()
