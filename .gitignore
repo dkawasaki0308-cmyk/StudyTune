@@ -16,6 +16,9 @@ node_modules/
 .env.*
 !.env.example
 
+# stray nested repo (以前の git init の残骸。手動削除予定)
+/StudyTune/
+
 # editor / os
 .DS_Store
 .idea/
