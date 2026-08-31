@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Go言語入門：Hello Worldから基本文法まで",
+    "url": "https://qiita.com/example/items/beginner-go-101",
+    "likes_count": 42,
+    "created_at": "2025-06-10T09:00:00+09:00",
+    "tags": [{ "name": "Go" }, { "name": "初心者" }, { "name": "プログラミング初心者" }],
+    "user": { "id": "study_taro" },
+    "body": "# はじめに\nこの記事はプログラミングを始めたばかりの人向けに、Go言語の基本を丁寧に説明します。\n## インストール\n公式サイトからインストーラをダウンロードして実行するだけです。\n## Hello World\n```go\npackage main\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello, World\")\n}\n```\n## 変数と型\n変数は var で宣言します。短縮形の := も使えます。\n## まとめ\nまずは手を動かしてみましょう。次回は関数について解説します。"
+  },
+  {
+    "title": "Goのスライスとマップを実務で使い分ける",
+    "url": "https://qiita.com/example/items/go-slice-map",
+    "likes_count": 88,
+    "created_at": "2025-07-02T12:30:00+09:00",
+    "tags": [{ "name": "Go" }, { "name": "備忘録" }],
+    "user": { "id": "gopher_hanako" },
+    "body": "# スライスとマップ\n業務コードでよく出てくるスライスとマップの扱いを整理します。\n## スライスの内部構造\nスライスは配列へのポインタ、長さ、容量を持つ構造体です。append で容量を超えると再割り当てが起きます。\n```go\ns := make([]int, 0, 4)\ns = append(s, 1, 2, 3)\n```\n## マップの注意点\nマップはイテレーション順が保証されません。並行アクセスには sync.Map か Mutex が必要です。\n## パフォーマンス\n事前に容量を見積もって make するとアロケーションを減らせます。"
+  },
+  {
+    "title": "Goのcontextパッケージを正しく理解する",
+    "url": "https://qiita.com/example/items/go-context-deep",
+    "likes_count": 210,
+    "created_at": "2025-05-20T18:00:00+09:00",
+    "tags": [{ "name": "Go" }, { "name": "並行処理" }],
+    "user": { "id": "concurrent_ken" },
+    "body": "goroutine のキャンセル伝播とタイムアウト制御には context を使います。基本は理解している前提で、内部実装に踏み込みます。\ncontext.WithCancel は親子関係を作り、Done チャネルのクローズでキャンセルを伝えます。デッドラインは time.Timer で管理されます。\nゴルーチンリークを防ぐには必ず cancel を呼びます。select で ctx.Done() を監視するパターンが定石です。\n詳細は https://go.dev/blog/context を参照してください。\n```go\nctx, cancel := context.WithTimeout(ctx, 3*time.Second)\ndefer cancel()\n```\nレースコンディションを避けるため、context に可変状態を入れてはいけません。"
+  },
+  {
+    "title": "Goスケジューラ(GMPモデル)の内部実装とプリエンプション",
+    "url": "https://qiita.com/example/items/go-scheduler-internals",
+    "likes_count": 355,
+    "created_at": "2025-04-01T10:00:00+09:00",
+    "tags": [
+      { "name": "Go" },
+      { "name": "内部実装" },
+      { "name": "golang-internal" },
+      { "name": "並行処理" }
+    ],
+    "user": { "id": "runtime_hacker" },
+    "body": "本記事では goroutine と channel の基礎は理解している前提で、Go ランタイムのスケジューラを解説します。\nGMP モデルは G(ゴルーチン)、M(OSスレッド)、P(プロセッサ)から成ります。スケジューリングは協調的かつプリエンプティブで、シグナルベースの非同期プリエンプションが Go 1.14 で導入されました。\nゴルーチンのスタックは初期 2KB で、モルフィングによって拡張されます。エスケープ解析によりヒープ割り当てとスタック割り当てが決まります。\nシステムコールでブロックすると M が P を手放し、ハンドオフが起きます。ネットワークポーラーは epoll/kqueue を使います。\nミューテックスの実装はスピン→セマフォへのフォールバックで、メモリバリアとアトミック操作に依存します。\n計算量とレイテンシのトレードオフをオーダー記法で議論します。詳細は https://research.swtch.com/gomm と https://go.dev/ref/spec を参照。\n```go\nruntime.Gosched()\n```",
+    "_comment": "assume the reader knows scheduling; heavy jargon"
+  },
+  {
+    "title": "PostgreSQLのインデックスとクエリプランを読む",
+    "url": "https://qiita.com/example/items/pg-index-explain",
+    "likes_count": 176,
+    "created_at": "2025-06-25T15:00:00+09:00",
+    "tags": [{ "name": "PostgreSQL" }, { "name": "SQL" }, { "name": "アーキテクチャ" }],
+    "user": { "id": "db_specialist" },
+    "body": "EXPLAIN ANALYZE の読み方と B-tree インデックスの効き方を解説します。トランザクション分離レベルと MVCC の基礎は把握している前提です。\nインデックススキャンとシーケンシャルスキャンの切り替えはクエリプランナのコスト見積もりで決まります。統計情報が古いと誤ったプランが選ばれます。\n複合インデックスは左端一致が原則です。部分インデックスや式インデックスも使えます。\nWAL とチェックポイントの関係、デッドロック検出についても触れます。\n```sql\nEXPLAIN ANALYZE SELECT * FROM orders WHERE user_id = 42 ORDER BY created_at DESC LIMIT 20;\n```"
+  },
+  {
+    "title": "Docker Composeで開発環境を作る最小構成",
+    "url": "https://qiita.com/example/items/docker-compose-minimal",
+    "likes_count": 64,
+    "created_at": "2025-07-18T11:00:00+09:00",
+    "tags": [{ "name": "Docker" }, { "name": "docker-compose" }, { "name": "初心者" }],
+    "user": { "id": "infra_beginner" },
+    "body": "# Docker Compose 入門\nはじめて Docker Compose を触る人向けに、Web アプリと DB の 2 サービス構成を作ります。\n## compose.yaml\n```yaml\nservices:\n  web:\n    build: .\n    ports: [\"8080:8080\"]\n  db:\n    image: postgres:16\n```\n## 起動\n`docker compose up` で両方立ち上がります。\n## まとめ\nボリュームとネットワークは次回説明します。まずは動かしてみましょう。"
+  }
+]
