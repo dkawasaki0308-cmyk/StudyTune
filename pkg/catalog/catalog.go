@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"studytune/internal/qiita"
-	"studytune/internal/scoring"
+	"studytune/pkg/qiita"
+	"studytune/pkg/scoring"
 )
 
 // Resource は UI に返す 1 リソース。
